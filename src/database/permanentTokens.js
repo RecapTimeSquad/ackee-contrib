@@ -1,78 +1,67 @@
-'use strict'
-
-const PermanentToken = require('../models/PermanentToken')
-const sortByProp = require('../utils/sortByProp')
+import PermanentToken from '../models/PermanentToken.js'
+import sortByProperty from '../utils/sortByProperty.js'
 
 const response = (entry) => ({
-	id: entry.id,
-	title: entry.title,
-	created: entry.created,
-	updated: entry.updated,
+  id: entry.id,
+  title: entry.title,
+  created: entry.created,
+  updated: entry.updated,
 })
 
-const add = async (data) => {
-	const enhance = (entry) => {
-		return entry == null ? entry : response(entry)
-	}
+export const add = async (data) => {
+  const enhance = (entry) => {
+    return entry == null ? entry : response(entry)
+  }
 
-	return enhance(
-		await PermanentToken.create({
-			title: data.title,
-		}),
-	)
+  return enhance(
+    await PermanentToken.create({
+      title: data.title,
+    }),
+  )
 }
 
-const all = async () => {
-	const enhance = (entries) => {
-		return entries
-			.map(response)
-			.sort(sortByProp('title'))
-	}
+export const all = async () => {
+  const enhance = (entries) => {
+    return entries.map(response).toSorted(sortByProperty('title'))
+  }
 
-	return enhance(
-		await PermanentToken.find({}),
-	)
+  return enhance(await PermanentToken.find({}))
 }
 
-const get = async (id) => {
-	const enhance = (entry) => {
-		return entry == null ? entry : response(entry)
-	}
+export const get = async (id) => {
+  const enhance = (entry) => {
+    return entry == null ? entry : response(entry)
+  }
 
-	return enhance(
-		await PermanentToken.findOne({ id }),
-	)
+  return enhance(await PermanentToken.findOne({ id }))
 }
 
-const update = async (id, data) => {
-	const enhance = (entry) => {
-		return entry == null ? entry : response(entry)
-	}
+export const update = async (id, data) => {
+  const enhance = (entry) => {
+    return entry == null ? entry : response(entry)
+  }
 
-	return enhance(
-		await PermanentToken.findOneAndUpdate({
-			id,
-		}, {
-			$set: {
-				title: data.title,
-				updated: Date.now(),
-			},
-		}, {
-			new: true,
-		}),
-	)
+  return enhance(
+    await PermanentToken.findOneAndUpdate(
+      {
+        id,
+      },
+      {
+        $set: {
+          title: data.title,
+          updated: Date.now(),
+        },
+      },
+      {
+        returnDocument: 'after',
+        runValidators: true,
+      },
+    ),
+  )
 }
 
-const del = (id) => {
-	return PermanentToken.findOneAndDelete({
-		id,
-	})
-}
-
-module.exports = {
-	add,
-	all,
-	get,
-	update,
-	del,
+export const del = (id) => {
+  return PermanentToken.findOneAndDelete({
+    id,
+  })
 }
